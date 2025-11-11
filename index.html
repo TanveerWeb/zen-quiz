@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZenQuiz</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="game-container">
+    <h1 class="logo">z<span>Q</span></h1>
+    <h2 id="question">Loading...</h2>
+    <div id="options"></div>
+    <button id="next">Next ➜</button>
+    <p id="score">Score: 0</p>
+  </div>
+
+  <div id="popup" class="popup">
+    <p id="popup-msg"></p>
+  </div>
+
+  <audio id="correct-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3"></audio>
+  <audio id="wrong-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3"></audio>
+
+  <script src="script.js"></script>
+</body>
+</html>
