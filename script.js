@@ -1,343 +1,175 @@
-/* script.js — ZenQuiz Final (50 unique questions)
-   - Uses IDs from provided HTML:
-     startBtn, startScreen, gameContainer, level, score, options,
-     popup, popupTitle, popupMessage, restartBtn, leaderboardBtn,
-     leaderboard, leaderboardList, backBtn
-   - Audio IDs: correctSound, wrongSound
-   - Persistent keys: zen_order_v6, zen_pos_v6, zen_score_v6, zen_leaderboard_v6
-*/
+// =======================
+// 🌐 ZEN QUIZ FINAL JS
+// =======================
 
-/* ====== Elements ====== */
+// Elements
 const startBtn = document.getElementById("startBtn");
-const startScreen = document.getElementById("startScreen");
 const gameContainer = document.getElementById("gameContainer");
-const levelEl = document.getElementById("level");
-const scoreEl = document.getElementById("score");
+const questionText = document.getElementById("question");
 const optionsContainer = document.getElementById("options");
-
-const popup = document.getElementById("popup");
-const popupTitle = document.getElementById("popupTitle");
-const popupMessage = document.getElementById("popupMessage");
-const restartBtn = document.getElementById("restartBtn");
-const leaderboardBtn = document.getElementById("leaderboardBtn");
-
-const leaderboardScreen = document.getElementById("leaderboard");
+const nextBtn = document.getElementById("nextBtn");
+const scoreDisplay = document.getElementById("score");
+const resultContainer = document.getElementById("resultContainer");
+const resultText = document.getElementById("resultText");
+const leaderboardContainer = document.getElementById("leaderboard");
 const leaderboardList = document.getElementById("leaderboardList");
-const backBtn = document.getElementById("backBtn");
 
-const correctSound = document.getElementById("correctSound");
-const wrongSound = document.getElementById("wrongSound");
+// Variables
+let currentQuestionIndex = 0;
+let score = 0;
+let usedQuestions = [];
+let username = localStorage.getItem("playerName") || prompt("Enter your name:");
+localStorage.setItem("playerName", username);
 
-/* ====== QUESTIONS (50 unique mix) ====== */
-const QUESTIONS = [
-  { q: "What has to be broken before you can use it?", answer: "Egg", options:["Egg","Stone","Seal","Glass"] },
-  { q: "What has hands but can't clap?", answer: "Clock", options:["Clock","Human","Chair","Tree"] },
-  { q: "What has a head and a tail but no body?", answer: "Coin", options:["Coin","Snake","Pen","Ribbon"] },
-  { q: "What gets wetter as it dries?", answer: "Towel", options:["Towel","Rain","Sponge","Sun"] },
-  { q: "What has keys but can't open locks?", answer: "Piano", options:["Piano","Map","Car","House"] },
+// ✅ 50 MIX QUESTIONS
+const questions = [
+  // Riddles
+  { q: "Ek aisi cheez jo hamesha badhti hai par kabhi ghat'ti nahi?", a: "Age", o: ["Age", "Height", "Time", "Money"] },
+  { q: "Kis cheez ke pair hote hain par chal nahi sakti?", a: "Table", o: ["Chair", "Car", "Table", "Spoon"] },
+  { q: "Main bina muh ke bolta hoon, bina kaan ke sunta hoon. Main kaun hoon?", a: "Echo", o: ["Wind", "Shadow", "Echo", "Sound"] },
+  { q: "Kis cheez ka sir aur poonch hota hai par shareer nahi?", a: "Coin", o: ["Snake", "Coin", "Bottle", "Lizard"] },
+  { q: "Kya hamesha aata hai par kabhi pahunchta nahi?", a: "Tomorrow", o: ["Train", "Tomorrow", "Sun", "Cloud"] },
 
-  { q: "What is the capital of India?", answer: "New Delhi", options:["Mumbai","New Delhi","Kolkata","Chennai"] },
-  { q: "Which planet is known as the Red Planet?", answer: "Mars", options:["Mars","Venus","Jupiter","Mercury"] },
-  { q: "What gas do plants produce?", answer: "Oxygen", options:["Oxygen","Carbon dioxide","Nitrogen","Hydrogen"] },
-  { q: "Who wrote 'Romeo and Juliet'?", answer: "William Shakespeare", options:["William Shakespeare","Tolstoy","Austen","Hemingway"] },
-  { q: "What is H2O commonly called?", answer: "Water", options:["Water","Hydrogen","Oxygen","Salt"] },
+  // Logic
+  { q: "Agar 5 machine 5 item 5 minute me banati hain, to 100 machine 100 item banane me kitna time legi?", a: "5 minutes", o: ["1 minute", "5 minutes", "100 minutes", "10 minutes"] },
+  { q: "Kis number me 3 bar 3 hota hai?", a: "333", o: ["333", "3333", "33", "303"] },
+  { q: "Ek kachua aur ek khargosh race kar rahe hain, kaun jeetega?", a: "Depends on speed", o: ["Tortoise", "Rabbit", "Both", "Depends on speed"] },
+  { q: "Agar ek ghari 12 baar bajti hai 12 ghante me, to 6 ghante me kitni baar bajegi?", a: "6", o: ["6", "12", "3", "9"] },
+  { q: "2 aadmi 2 din me 2 ghar banate hain. To 6 aadmi 6 din me kitne ghar banayenge?", a: "18", o: ["12", "18", "6", "9"] },
 
-  { q: "Find next: 2, 4, 8, 16, ?", answer: "32", options:["24","30","32","36"] },
-  { q: "If A=1, B=2, ... Z=?, what is Z?", answer: "26", options:["25","26","27","24"] },
-  { q: "If 3 cats catch 3 mice in 3 minutes, how many cats to catch 6 mice in 6 minutes?", answer: "3", options:["3","6","2","4"] },
-  { q: "What runs but never walks?", answer: "Water", options:["Water","Car","Dog","Clock"] },
-  { q: "What can fill a room but takes no space?", answer: "Light", options:["Light","Air","Sound","Dust"] },
+  // GK
+  { q: "Bharat ki rajdhani kya hai?", a: "New Delhi", o: ["Mumbai", "New Delhi", "Kolkata", "Chennai"] },
+  { q: "Taj Mahal kisne banwaya?", a: "Shah Jahan", o: ["Akbar", "Shah Jahan", "Babur", "Aurangzeb"] },
+  { q: "World's longest river?", a: "Nile", o: ["Amazon", "Ganga", "Nile", "Yangtze"] },
+  { q: "Who wrote 'Ramayana'?", a: "Valmiki", o: ["Tulsidas", "Valmiki", "Vyasa", "Kalidas"] },
+  { q: "Which planet is called the Red Planet?", a: "Mars", o: ["Earth", "Jupiter", "Mars", "Venus"] },
 
-  { q: "What is the largest planet in the solar system?", answer: "Jupiter", options:["Jupiter","Saturn","Earth","Mars"] },
-  { q: "Which animal is the fastest on land?", answer: "Cheetah", options:["Cheetah","Lion","Tiger","Horse"] },
-  { q: "What building has the most stories?", answer: "Library", options:["Library","Skyscraper","House","School"] },
-  { q: "Which ocean is the largest?", answer: "Pacific", options:["Pacific","Atlantic","Indian","Arctic"] },
-  { q: "What has one eye but cannot see?", answer: "Needle", options:["Needle","Storm","Potato","Cyclops"] },
+  // Mix more (same pattern, to reach 50)
+  { q: "Light travels faster than?", a: "Sound", o: ["Sound", "Water", "Air", "Electricity"] },
+  { q: "Which gas do plants release?", a: "Oxygen", o: ["Carbon Dioxide", "Oxygen", "Nitrogen", "Helium"] },
+  { q: "What is 12 × 12?", a: "144", o: ["124", "142", "144", "146"] },
+  { q: "Which month has 28 days?", a: "All months", o: ["February", "All months", "January", "None"] },
+  { q: "How many hours in 2 days?", a: "48", o: ["24", "48", "36", "72"] },
 
-  { q: "What gets bigger the more you take away?", answer: "Hole", options:["Hole","Debt","Shadow","Pit"] },
-  { q: "How many continents are there on Earth?", answer: "Seven", options:["Five","Six","Seven","Eight"] },
-  { q: "Which river is the longest in the world?", answer: "Nile", options:["Nile","Amazon","Yangtze","Mississippi"] },
-  { q: "Who discovered gravity?", answer: "Isaac Newton", options:["Isaac Newton","Galileo","Einstein","Tesla"] },
-  { q: "Which planet has rings?", answer: "Saturn", options:["Saturn","Jupiter","Uranus","Neptune"] },
+  { q: "Kis janwar ke daant hamesha badhte rehte hain?", a: "Rabbit", o: ["Dog", "Cat", "Rabbit", "Horse"] },
+  { q: "Which color forms when you mix red and blue?", a: "Purple", o: ["Green", "Yellow", "Purple", "Orange"] },
+  { q: "Which ocean is largest?", a: "Pacific", o: ["Indian", "Pacific", "Atlantic", "Arctic"] },
+  { q: "Which organ purifies blood?", a: "Kidney", o: ["Liver", "Kidney", "Heart", "Lungs"] },
+  { q: "How many continents are there?", a: "7", o: ["5", "6", "7", "8"] },
 
-  { q: "Which country is called the Land of the Rising Sun?", answer: "Japan", options:["Japan","China","Korea","Thailand"] },
-  { q: "What is the hardest natural substance?", answer: "Diamond", options:["Diamond","Gold","Iron","Graphite"] },
-  { q: "What is the boiling point of water at sea level (°C)?", answer: "100", options:["90","100","80","120"] },
-  { q: "What is the currency of the United States?", answer: "Dollar", options:["Dollar","Euro","Rupee","Yen"] },
-  { q: "I speak without a mouth and hear without ears. What am I?", answer: "Echo", options:["Echo","Wind","Shadow","Silence"] },
+  { q: "India got independence in?", a: "1947", o: ["1945", "1947", "1950", "1930"] },
+  { q: "Which is the smallest planet?", a: "Mercury", o: ["Mars", "Mercury", "Earth", "Venus"] },
+  { q: "Who discovered gravity?", a: "Newton", o: ["Einstein", "Newton", "Galileo", "Edison"] },
+  { q: "Which festival is of lights?", a: "Diwali", o: ["Holi", "Eid", "Diwali", "Baisakhi"] },
+  { q: "National animal of India?", a: "Tiger", o: ["Lion", "Tiger", "Elephant", "Peacock"] },
 
-  { q: "What comes once in a minute, twice in a moment, but never in a thousand years?", answer: "Letter M", options:["Letter M","Second","Hour","Century"] },
-  { q: "If 9 + 1 = 910 (concat), then 8 + 2 = ?", answer: "810", options:["10","810","82","20"] },
-  { q: "If 1=5, 2=25, 3=125 then 4 = ?", answer: "625", options:["256","625","512","1024"] },
-  { q: "What has roots that nobody sees and is taller than trees?", answer: "Mountain", options:["Mountain","Tree","Plant","Rock"] },
-  { q: "Which is the tallest mountain in the world?", answer: "Mount Everest", options:["Mount Everest","K2","Kangchenjunga","Lhotse"] },
+  { q: "Who invented bulb?", a: "Edison", o: ["Edison", "Newton", "Tesla", "Einstein"] },
+  { q: "Largest desert?", a: "Sahara", o: ["Thar", "Sahara", "Gobi", "Arabian"] },
+  { q: "Fastest land animal?", a: "Cheetah", o: ["Tiger", "Cheetah", "Lion", "Leopard"] },
+  { q: "Largest mammal?", a: "Blue Whale", o: ["Elephant", "Blue Whale", "Shark", "Giraffe"] },
+  { q: "Human body has how many bones?", a: "206", o: ["205", "210", "206", "201"] },
 
-  { q: "What has many teeth but cannot bite?", answer: "Comb", options:["Comb","Saw","Fork","Gear"] },
-  { q: "What can you catch but not throw?", answer: "Cold", options:["Cold","Ball","Fish","Stone"] },
-  { q: "What has keys but no locks, space but no room?", answer: "Keyboard", options:["Keyboard","Piano","Map","Phone"] },
-  { q: "What has four fingers and a thumb but isn't alive?", answer: "Glove", options:["Glove","Hand","Robot","Statue"] },
-  { q: "The more you take, the more you leave behind. What am I?", answer: "Footsteps", options:["Footsteps","Time","Money","Memories"] },
+  { q: "Water freezes at?", a: "0°C", o: ["0°C", "32°C", "100°C", "−10°C"] },
+  { q: "Which is India’s national bird?", a: "Peacock", o: ["Parrot", "Peacock", "Crow", "Sparrow"] },
+  { q: "Which planet has rings?", a: "Saturn", o: ["Saturn", "Mars", "Neptune", "Venus"] },
+  { q: "Who painted Mona Lisa?", a: "Leonardo da Vinci", o: ["Leonardo da Vinci", "Picasso", "Michelangelo", "Van Gogh"] },
+  { q: "Brain of computer?", a: "CPU", o: ["Mouse", "CPU", "RAM", "Hard disk"] },
 
-  { q: "What can travel around the world while staying in one spot?", answer: "Stamp", options:["Stamp","Sun","Moon","Clock"] },
-  { q: "I am not alive but grow; I don't have lungs but need air. What am I?", answer: "Fire", options:["Fire","Plant","Cloud","Dust"] },
-  { q: "What can run but never walks, has a mouth but never talks?", answer: "River", options:["River","Car","Dog","Clock"] },
-  { q: "Which organ pumps blood through the body?", answer: "Heart", options:["Heart","Liver","Lungs","Kidney"] },
-  { q: "Which gas is most essential for human respiration?", answer: "Oxygen", options:["Oxygen","Carbon dioxide","Nitrogen","Helium"] },
+  { q: "Which metal is liquid at room temp?", a: "Mercury", o: ["Mercury", "Iron", "Silver", "Copper"] },
+  { q: "Which day comes after Tuesday?", a: "Wednesday", o: ["Monday", "Wednesday", "Friday", "Sunday"] },
+  { q: "How many letters in English alphabet?", a: "26", o: ["24", "25", "26", "28"] },
+  { q: "National fruit of India?", a: "Mango", o: ["Apple", "Banana", "Mango", "Grapes"] },
+  { q: "Which sense organ helps us to see?", a: "Eyes", o: ["Ears", "Eyes", "Nose", "Skin"] },
 
-  { q: "Which animal is largest mammal?", answer: "Blue whale", options:["Blue whale","Elephant","Whale shark","Hippo"] },
-  { q: "Which scientist developed the theory of relativity?", answer: "Albert Einstein", options:["Albert Einstein","Isaac Newton","Galileo","Tesla"] },
-  { q: "How many colors in a rainbow?", answer: "Seven", options:["Six","Seven","Eight","Nine"] },
-  { q: "What is the national animal of India?", answer: "Tiger", options:["Tiger","Elephant","Lion","Leopard"] },
-  { q: "Which bird can imitate human speech?", answer: "Parrot", options:["Parrot","Sparrow","Crow","Pigeon"] },
-
-  { q: "What is the currency of Japan?", answer: "Yen", options:["Yen","Dollar","Rupee","Euro"] },
-  { q: "Who was the first person to step on the Moon?", answer: "Neil Armstrong", options:["Neil Armstrong","Buzz Aldrin","Yuri Gagarin","Michael Collins"] },
-  { q: "What is the chemical formula of water?", answer: "H2O", options:["H2O","CO2","O2","NaCl"] },
-  { q: "Which organ helps in digestion by producing bile?", answer: "Liver", options:["Liver","Kidney","Pancreas","Stomach"] },
-  { q: "What is the smallest prime number?", answer: "2", options:["1","2","3","5"] }
+  { q: "Earth revolves around?", a: "Sun", o: ["Moon", "Sun", "Mars", "Venus"] },
+  { q: "Which animal gives wool?", a: "Sheep", o: ["Goat", "Cow", "Sheep", "Buffalo"] },
+  { q: "Which shape has 3 sides?", a: "Triangle", o: ["Square", "Circle", "Triangle", "Pentagon"] },
+  { q: "Which country invented paper?", a: "China", o: ["India", "China", "Japan", "Egypt"] },
+  { q: "First man on moon?", a: "Neil Armstrong", o: ["Neil Armstrong", "Buzz Aldrin", "Yuri Gagarin", "Kalpana Chawla"] }
 ];
 
-/* ====== Storage keys and state ====== */
-const KEY_ORDER = "zen_order_v6";
-const KEY_POS = "zen_pos_v6";
-const KEY_SCORE = "zen_score_v6";
-const KEY_LB = "zen_leaderboard_v6";
-
-function loadJSON(key, fallback) {
-  try {
-    const v = localStorage.getItem(key);
-    return v ? JSON.parse(v) : fallback;
-  } catch (e) { return fallback; }
-}
-function saveJSON(key, val) {
-  try { localStorage.setItem(key, JSON.stringify(val)); } catch(e) {}
+// ✅ Shuffle options for randomness
+function shuffle(array) {
+  return array.sort(() => Math.random() - 0.5);
 }
 
-/* initialize persistent order (non-repeating) */
-let order = loadJSON(KEY_ORDER, null);
-if (!Array.isArray(order) || order.length !== QUESTIONS.length) {
-  order = QUESTIONS.map((_, i) => i);
-  // Fisher-Yates shuffle to randomize order
-  for (let i = order.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [order[i], order[j]] = [order[j], order[i]];
-  }
-  saveJSON(KEY_ORDER, order);
-}
-
-/* position & score */
-let pos = Number(localStorage.getItem(KEY_POS));
-if (!Number.isInteger(pos) || pos < 0) pos = 0;
-
-let score = Number(localStorage.getItem(KEY_SCORE));
-if (!Number.isInteger(score)) score = 0;
-
-/* leaderboard */
-let leaderboard = loadJSON(KEY_LB, []);
-
-/* ====== UI helpers ====== */
-function updateScore() {
-  if (scoreEl) scoreEl.textContent = score;
-}
-function updateLevel() {
-  if (levelEl) levelEl.textContent = (pos + 1) + " / " + QUESTIONS.length;
-}
-
-/* ====== Start / Continue behavior ====== */
-if (pos > 0 && pos < order.length) {
-  // continue option
-  if (startBtn) startBtn.textContent = "Continue Game";
-}
-
-/* start button */
-startBtn && startBtn.addEventListener("click", () => {
-  startScreen && (startScreen.style.display = "none");
-  gameContainer && (gameContainer.classList.remove("hidden"), gameContainer.style.display = "block");
-  updateScore(); updateLevel();
-  loadQuestion();
-});
-
-/* ====== Load current question ====== */
+// ✅ Load next question
 function loadQuestion() {
-  // if finished
-  if (pos >= order.length) {
-    return finishGame();
-  }
-  const qIndex = order[pos];
-  const item = QUESTIONS[qIndex];
+  if (usedQuestions.length === questions.length) return endGame();
+  let qIndex;
+  do {
+    qIndex = Math.floor(Math.random() * questions.length);
+  } while (usedQuestions.includes(qIndex));
 
-  // show question
-  const questionTitle = document.getElementById("question");
-  if (questionTitle) questionTitle.textContent = item.q;
-
-  // prepare options (shuffle)
-  const opts = item.options.map(o => ({ text: o, correct: o === item.answer }));
-  for (let i = opts.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [opts[i], opts[j]] = [opts[j], opts[i]];
-  }
-
-  // render buttons
-  if (optionsContainer) {
-    optionsContainer.innerHTML = "";
-    opts.forEach(opt => {
-      const b = document.createElement("button");
-      b.className = "option";
-      b.textContent = opt.text;
-      b.onclick = () => handleAnswer(b, opt.correct);
-      optionsContainer.appendChild(b);
-    });
-  }
-
-  updateScore();
-  updateLevel();
-}
-
-/* ====== Answer handling ====== */
-function handleAnswer(buttonEl, isCorrect) {
-  // disable all options immediately
-  const all = optionsContainer.querySelectorAll("button");
-  all.forEach(x => x.disabled = true);
-
-  if (isCorrect) {
-    // +10
-    score += 10;
-    buttonEl.classList.add("correct");
-    try { correctSound.currentTime = 0; correctSound.play(); } catch(e){}
-  } else {
-    // -5
-    score -= 5;
-    buttonEl.classList.add("wrong");
-    try { wrongSound.currentTime = 0; wrongSound.play(); } catch(e){}
-  }
-
-  // persist score
-  saveJSON(KEY_SCORE, score);
-  updateScore();
-
-  // move to next after delay
-  setTimeout(() => {
-    pos++;
-    saveJSON(KEY_POS, pos);
-    // if reached end
-    if (pos >= order.length) {
-      finishGame();
-    } else {
-      // silent difficulty: we don't show alert; UI shows level number
-      loadQuestion();
-    }
-  }, 700);
-}
-
-/* ====== Finish & show popup / save flow ====== */
-function finishGame() {
-  // hide game container
-  gameContainer && (gameContainer.classList.add("hidden"), gameContainer.style.display = "none");
-
-  // prepare IQ message
-  let msg = "";
-  if (score < 100) msg = "Your IQ was low — work hard!";
-  else if (score < 200) msg = "Nice try! Keep practicing!";
-  else if (score < 300) msg = "Very good — but work a little harder!";
-  else msg = "Excellent! Genius level IQ!";
-
-  // show popup
-  if (popup) {
-    popup.style.display = "flex";
-    popupTitle && (popupTitle.textContent = "Quiz Complete 🎉");
-    popupMessage && (popupMessage.textContent = msg + " — Your score: " + score);
-  }
-
-  // wait a moment then prompt to save name
-  setTimeout(() => {
-    const name = prompt("Enter name to save score on leaderboard (leave empty to skip):", "Player");
-    if (name && name.trim()) {
-      leaderboard.push({ name: name.trim(), score: score, date: Date.now() });
-      // sort desc and keep top 30
-      leaderboard.sort((a,b) => b.score - a.score);
-      leaderboard = leaderboard.slice(0, 30);
-      saveJSON(KEY_LB, leaderboard);
-    }
-    renderLeaderboard();
-  }, 300);
-}
-
-/* ====== Leaderboard rendering (animated cards) ====== */
-function renderLeaderboard() {
-  // hide popup when showing leaderboard
-  if (popup) popup.style.display = "none";
-  if (leaderboardScreen) {
-    leaderboardScreen.classList.remove("hidden");
-    leaderboardScreen.style.display = "block";
-  }
-  if (!leaderboardList) return;
-
-  leaderboardList.innerHTML = "";
-  if (!leaderboard || leaderboard.length === 0) {
-    leaderboardList.innerHTML = "<p style='color:#556'>No scores yet.</p>";
-    return;
-  }
-  // show top 10
-  const top = leaderboard.slice(0, 10);
-  top.forEach((entry, i) => {
-    const card = document.createElement("div");
-    card.className = "leaderboard-card";
-    card.style.animationDelay = (i * 80) + "ms";
-    card.innerHTML = `
-      <strong style="color:#0077cc">${i+1}. ${escapeHtml(entry.name)}</strong>
-      <div style="font-weight:700">${entry.score} pts</div>
-      <small style="color:#667">${new Date(entry.date).toLocaleString()}</small>
-    `;
-    leaderboardList.appendChild(card);
+  usedQuestions.push(qIndex);
+  const q = questions[qIndex];
+  questionText.textContent = q.q;
+  optionsContainer.innerHTML = "";
+  shuffle(q.o).forEach(opt => {
+    const btn = document.createElement("button");
+    btn.textContent = opt;
+    btn.className = "option";
+    btn.onclick = () => checkAnswer(opt, q.a);
+    optionsContainer.appendChild(btn);
   });
 }
 
-/* ====== Restart / Back handlers ====== */
-restartBtn && restartBtn.addEventListener("click", () => {
-  // full restart: clear progress but keep leaderboard
-  if (!confirm("Start a new game? Current progress will reset.")) return;
-  pos = 0;
-  score = 0;
-  // create new randomized order
-  order = QUESTIONS.map((_, i) => i);
-  for (let i = order.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [order[i], order[j]] = [order[j], order[i]];
+// ✅ Check answer
+function checkAnswer(selected, correct) {
+  const buttons = document.querySelectorAll(".option");
+  buttons.forEach(b => (b.disabled = true));
+  if (selected === correct) {
+    score += 10;
+    scoreDisplay.textContent = `Score: ${score}`;
+  } else {
+    score -= 5;
+    scoreDisplay.textContent = `Score: ${score}`;
   }
-  saveJSON(KEY_ORDER, order);
-  saveJSON(KEY_POS, pos);
-  saveJSON(KEY_SCORE, score);
-  // UI
-  leaderboardScreen && (leaderboardScreen.classList.add("hidden"), leaderboardScreen.style.display = "none");
-  startScreen && (startScreen.style.display = "block");
-  popup && (popup.style.display = "none");
-  gameContainer && (gameContainer.classList.add("hidden"), gameContainer.style.display = "none");
-  if (startBtn) startBtn.textContent = "Start Game";
-});
-
-leaderboardBtn && leaderboardBtn.addEventListener("click", () => {
-  renderLeaderboard();
-});
-
-backBtn && backBtn.addEventListener("click", () => {
-  // go back to home/start screen
-  leaderboardScreen && (leaderboardScreen.classList.add("hidden"), leaderboardScreen.style.display = "none");
-  popup && (popup.style.display = "none");
-  startScreen && (startScreen.style.display = "block");
-});
-
-/* ====== Utility: escape html ====== */
-function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]); });
+  nextBtn.style.display = "block";
 }
 
-/* ====== On load: update UI placeholders ====== */
-(function boot() {
-  updateScore();
-  updateLevel();
-  // if already finished
-  if (pos >= order.length) {
-    // show popup with final info
-    finishGame();
+// ✅ Next button
+nextBtn.onclick = () => {
+  currentQuestionIndex++;
+  nextBtn.style.display = "none";
+  if (currentQuestionIndex < 50) {
+    loadQuestion();
+  } else {
+    endGame();
   }
-})();
+};
+
+// ✅ End game + Leaderboard
+function endGame() {
+  gameContainer.style.display = "none";
+  resultContainer.style.display = "block";
+  let iqMessage = "";
+  if (score < 150) iqMessage = "😢 Your IQ was low, work harder!";
+  else if (score < 300) iqMessage = "🙂 Good job, but improve a bit!";
+  else iqMessage = "🚀 Genius! You nailed it!";
+
+  resultText.textContent = `${username}, your final score is ${score}. ${iqMessage}`;
+  updateLeaderboard(username, score);
+}
+
+// ✅ Leaderboard local storage
+function updateLeaderboard(name, score) {
+  let data = JSON.parse(localStorage.getItem("leaderboard") || "[]");
+  data.push({ name, score });
+  data.sort((a, b) => b.score - a.score);
+  data = data.slice(0, 5);
+  localStorage.setItem("leaderboard", JSON.stringify(data));
+  leaderboardList.innerHTML = "";
+  data.forEach(d => {
+    const li = document.createElement("li");
+    li.textContent = `${d.name} — ${d.score}`;
+    leaderboardList.appendChild(li);
+  });
+}
+
+// ✅ Start game
+startBtn.onclick = () => {
+  startBtn.style.display = "none";
+  gameContainer.style.display = "block";
+  loadQuestion();
+};
