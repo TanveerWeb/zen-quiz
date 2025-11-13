@@ -1,175 +1,140 @@
-// =======================
-// 🌐 ZEN QUIZ FINAL JS
-// =======================
+const startBtn = document.getElementById('startBtn');
+const restartBtn = document.getElementById('restartBtn');
+const quizScreen = document.getElementById('quiz-screen');
+const startScreen = document.getElementById('start-screen');
+const resultScreen = document.getElementById('result-screen');
+const questionElem = document.getElementById('question');
+const optionsElem = document.getElementById('options');
+const scoreElem = document.getElementById('score');
+const levelElem = document.getElementById('level');
+const resultText = document.getElementById('result-text');
+const leaderboardElem = document.getElementById('leaderboard');
 
-// Elements
-const startBtn = document.getElementById("startBtn");
-const gameContainer = document.getElementById("gameContainer");
-const questionText = document.getElementById("question");
-const optionsContainer = document.getElementById("options");
-const nextBtn = document.getElementById("nextBtn");
-const scoreDisplay = document.getElementById("score");
-const resultContainer = document.getElementById("resultContainer");
-const resultText = document.getElementById("resultText");
-const leaderboardContainer = document.getElementById("leaderboard");
-const leaderboardList = document.getElementById("leaderboardList");
-
-// Variables
-let currentQuestionIndex = 0;
+let currentQuestion = 0;
 let score = 0;
 let usedQuestions = [];
-let username = localStorage.getItem("playerName") || prompt("Enter your name:");
-localStorage.setItem("playerName", username);
 
-// ✅ 50 MIX QUESTIONS
 const questions = [
-  // Riddles
-  { q: "Ek aisi cheez jo hamesha badhti hai par kabhi ghat'ti nahi?", a: "Age", o: ["Age", "Height", "Time", "Money"] },
-  { q: "Kis cheez ke pair hote hain par chal nahi sakti?", a: "Table", o: ["Chair", "Car", "Table", "Spoon"] },
-  { q: "Main bina muh ke bolta hoon, bina kaan ke sunta hoon. Main kaun hoon?", a: "Echo", o: ["Wind", "Shadow", "Echo", "Sound"] },
-  { q: "Kis cheez ka sir aur poonch hota hai par shareer nahi?", a: "Coin", o: ["Snake", "Coin", "Bottle", "Lizard"] },
-  { q: "Kya hamesha aata hai par kabhi pahunchta nahi?", a: "Tomorrow", o: ["Train", "Tomorrow", "Sun", "Cloud"] },
-
-  // Logic
-  { q: "Agar 5 machine 5 item 5 minute me banati hain, to 100 machine 100 item banane me kitna time legi?", a: "5 minutes", o: ["1 minute", "5 minutes", "100 minutes", "10 minutes"] },
-  { q: "Kis number me 3 bar 3 hota hai?", a: "333", o: ["333", "3333", "33", "303"] },
-  { q: "Ek kachua aur ek khargosh race kar rahe hain, kaun jeetega?", a: "Depends on speed", o: ["Tortoise", "Rabbit", "Both", "Depends on speed"] },
-  { q: "Agar ek ghari 12 baar bajti hai 12 ghante me, to 6 ghante me kitni baar bajegi?", a: "6", o: ["6", "12", "3", "9"] },
-  { q: "2 aadmi 2 din me 2 ghar banate hain. To 6 aadmi 6 din me kitne ghar banayenge?", a: "18", o: ["12", "18", "6", "9"] },
-
-  // GK
-  { q: "Bharat ki rajdhani kya hai?", a: "New Delhi", o: ["Mumbai", "New Delhi", "Kolkata", "Chennai"] },
-  { q: "Taj Mahal kisne banwaya?", a: "Shah Jahan", o: ["Akbar", "Shah Jahan", "Babur", "Aurangzeb"] },
-  { q: "World's longest river?", a: "Nile", o: ["Amazon", "Ganga", "Nile", "Yangtze"] },
-  { q: "Who wrote 'Ramayana'?", a: "Valmiki", o: ["Tulsidas", "Valmiki", "Vyasa", "Kalidas"] },
-  { q: "Which planet is called the Red Planet?", a: "Mars", o: ["Earth", "Jupiter", "Mars", "Venus"] },
-
-  // Mix more (same pattern, to reach 50)
-  { q: "Light travels faster than?", a: "Sound", o: ["Sound", "Water", "Air", "Electricity"] },
-  { q: "Which gas do plants release?", a: "Oxygen", o: ["Carbon Dioxide", "Oxygen", "Nitrogen", "Helium"] },
-  { q: "What is 12 × 12?", a: "144", o: ["124", "142", "144", "146"] },
-  { q: "Which month has 28 days?", a: "All months", o: ["February", "All months", "January", "None"] },
-  { q: "How many hours in 2 days?", a: "48", o: ["24", "48", "36", "72"] },
-
-  { q: "Kis janwar ke daant hamesha badhte rehte hain?", a: "Rabbit", o: ["Dog", "Cat", "Rabbit", "Horse"] },
-  { q: "Which color forms when you mix red and blue?", a: "Purple", o: ["Green", "Yellow", "Purple", "Orange"] },
-  { q: "Which ocean is largest?", a: "Pacific", o: ["Indian", "Pacific", "Atlantic", "Arctic"] },
-  { q: "Which organ purifies blood?", a: "Kidney", o: ["Liver", "Kidney", "Heart", "Lungs"] },
-  { q: "How many continents are there?", a: "7", o: ["5", "6", "7", "8"] },
-
-  { q: "India got independence in?", a: "1947", o: ["1945", "1947", "1950", "1930"] },
-  { q: "Which is the smallest planet?", a: "Mercury", o: ["Mars", "Mercury", "Earth", "Venus"] },
-  { q: "Who discovered gravity?", a: "Newton", o: ["Einstein", "Newton", "Galileo", "Edison"] },
-  { q: "Which festival is of lights?", a: "Diwali", o: ["Holi", "Eid", "Diwali", "Baisakhi"] },
-  { q: "National animal of India?", a: "Tiger", o: ["Lion", "Tiger", "Elephant", "Peacock"] },
-
-  { q: "Who invented bulb?", a: "Edison", o: ["Edison", "Newton", "Tesla", "Einstein"] },
-  { q: "Largest desert?", a: "Sahara", o: ["Thar", "Sahara", "Gobi", "Arabian"] },
-  { q: "Fastest land animal?", a: "Cheetah", o: ["Tiger", "Cheetah", "Lion", "Leopard"] },
-  { q: "Largest mammal?", a: "Blue Whale", o: ["Elephant", "Blue Whale", "Shark", "Giraffe"] },
-  { q: "Human body has how many bones?", a: "206", o: ["205", "210", "206", "201"] },
-
-  { q: "Water freezes at?", a: "0°C", o: ["0°C", "32°C", "100°C", "−10°C"] },
-  { q: "Which is India’s national bird?", a: "Peacock", o: ["Parrot", "Peacock", "Crow", "Sparrow"] },
-  { q: "Which planet has rings?", a: "Saturn", o: ["Saturn", "Mars", "Neptune", "Venus"] },
-  { q: "Who painted Mona Lisa?", a: "Leonardo da Vinci", o: ["Leonardo da Vinci", "Picasso", "Michelangelo", "Van Gogh"] },
-  { q: "Brain of computer?", a: "CPU", o: ["Mouse", "CPU", "RAM", "Hard disk"] },
-
-  { q: "Which metal is liquid at room temp?", a: "Mercury", o: ["Mercury", "Iron", "Silver", "Copper"] },
-  { q: "Which day comes after Tuesday?", a: "Wednesday", o: ["Monday", "Wednesday", "Friday", "Sunday"] },
-  { q: "How many letters in English alphabet?", a: "26", o: ["24", "25", "26", "28"] },
-  { q: "National fruit of India?", a: "Mango", o: ["Apple", "Banana", "Mango", "Grapes"] },
-  { q: "Which sense organ helps us to see?", a: "Eyes", o: ["Ears", "Eyes", "Nose", "Skin"] },
-
-  { q: "Earth revolves around?", a: "Sun", o: ["Moon", "Sun", "Mars", "Venus"] },
-  { q: "Which animal gives wool?", a: "Sheep", o: ["Goat", "Cow", "Sheep", "Buffalo"] },
-  { q: "Which shape has 3 sides?", a: "Triangle", o: ["Square", "Circle", "Triangle", "Pentagon"] },
-  { q: "Which country invented paper?", a: "China", o: ["India", "China", "Japan", "Egypt"] },
-  { q: "First man on moon?", a: "Neil Armstrong", o: ["Neil Armstrong", "Buzz Aldrin", "Yuri Gagarin", "Kalpana Chawla"] }
+  { q: "What has to be broken before you can use it?", a: "Egg", o: ["Egg","Glass","Box","Seal"] },
+  { q: "What has hands but can’t clap?", a: "Clock", o: ["Clock","Monkey","Tree","Fan"] },
+  { q: "What gets wetter as it dries?", a: "Towel", o: ["Towel","Water","Rain","Sun"] },
+  { q: "What has keys but can’t open locks?", a: "Piano", o: ["Piano","Computer","Car","Lock"] },
+  { q: "What can travel around the world while staying in a corner?", a: "Stamp", o: ["Stamp","Sun","Wind","Sound"] },
+  { q: "What gas do plants produce during photosynthesis?", a: "Oxygen", o: ["Oxygen","Carbon","Nitrogen","Helium"] },
+  { q: "Who painted the Mona Lisa?", a: "Leonardo da Vinci", o: ["Leonardo da Vinci","Picasso","Michelangelo","Van Gogh"] },
+  { q: "What is the capital of India?", a: "New Delhi", o: ["New Delhi","Mumbai","Kolkata","Chennai"] },
+  { q: "What number should come next? 2,4,8,16,?", a: "32", o: ["32","24","30","36"] },
+  { q: "Which is heavier: 1 kg cotton or 1 kg iron?", a: "Same", o: ["Same","Iron","Cotton","None"] },
+  { q: "What can fill a room but takes up no space?", a: "Light", o: ["Light","Air","Water","Sound"] },
+  { q: "Who invented the light bulb?", a: "Thomas Edison", o: ["Thomas Edison","Newton","Tesla","Bell"] },
+  { q: "What has a neck but no head?", a: "Bottle", o: ["Bottle","Snake","Drum","Shirt"] },
+  { q: "Which is the smallest ocean?", a: "Arctic", o: ["Arctic","Pacific","Indian","Atlantic"] },
+  { q: "What belongs to you but is used by others?", a: "Name", o: ["Name","Phone","Money","Book"] },
+  { q: "Which planet is known as the Red Planet?", a: "Mars", o: ["Mars","Earth","Venus","Jupiter"] },
+  { q: "What organ pumps blood?", a: "Heart", o: ["Heart","Liver","Brain","Lungs"] },
+  { q: "What has an ear but cannot hear?", a: "Corn", o: ["Corn","Pot","Radio","Drum"] },
+  { q: "If A=1, B=2, C=3, then Z=?", a: "26", o: ["26","24","25","23"] },
+  { q: "What’s half of 2 plus 2?", a: "3", o: ["3","2","4","2.5"] },
+  { q: "If 5 cats catch 5 mice in 5 minutes, 100 mice in 100 min need?", a: "5", o: ["5","10","20","50"] },
+  { q: "Who is known as Missile Man of India?", a: "A.P.J. Abdul Kalam", o: ["A.P.J. Abdul Kalam","Einstein","Newton","Raman"] },
+  { q: "Which animal is known as Ship of Desert?", a: "Camel", o: ["Camel","Horse","Elephant","Ox"] },
+  { q: "What has legs but doesn’t walk?", a: "Table", o: ["Table","Car","Chair","Tree"] },
+  { q: "What is the national flower of India?", a: "Lotus", o: ["Lotus","Rose","Sunflower","Tulip"] },
+  { q: "What has one eye but can’t see?", a: "Needle", o: ["Needle","Storm","Eye","Fish"] },
+  { q: "What can’t talk but replies when spoken to?", a: "Echo", o: ["Echo","Shadow","Mirror","Bell"] },
+  { q: "What’s always in front of you but can’t be seen?", a: "Future", o: ["Future","Air","Mirror","Light"] },
+  { q: "Which planet has rings?", a: "Saturn", o: ["Saturn","Venus","Mars","Mercury"] },
+  { q: "What is full of holes but still holds water?", a: "Sponge", o: ["Sponge","Cup","Bag","Rock"] },
+  { q: "What is the capital of France?", a: "Paris", o: ["Paris","London","Berlin","Rome"] },
+  { q: "What has many teeth but can’t bite?", a: "Comb", o: ["Comb","Dog","Gear","Brush"] },
+  { q: "Which river is longest?", a: "Nile", o: ["Nile","Amazon","Ganga","Yangtze"] },
+  { q: "What can fly without wings?", a: "Time", o: ["Time","Air","Bird","Sound"] },
+  { q: "Which gas do we breathe in?", a: "Oxygen", o: ["Oxygen","Hydrogen","CO2","Nitrogen"] },
+  { q: "What gets bigger the more you take away?", a: "Hole", o: ["Hole","Balloon","Number","Water"] },
+  { q: "Which country is Land of Rising Sun?", a: "Japan", o: ["Japan","India","China","Korea"] },
+  { q: "What’s next in pattern: A,C,F,J,O,?", a: "U", o: ["U","T","S","V"] },
+  { q: "What has roots that nobody sees?", a: "Mountain", o: ["Mountain","Tree","Grass","River"] },
+  { q: "Who discovered gravity?", a: "Isaac Newton", o: ["Isaac Newton","Einstein","Tesla","Edison"] },
+  { q: "What number of colors in rainbow?", a: "Seven", o: ["Seven","Six","Five","Eight"] },
+  { q: "If yesterday was Thursday, after tomorrow?", a: "Sunday", o: ["Sunday","Saturday","Monday","Tuesday"] },
+  { q: "What organ helps you think?", a: "Brain", o: ["Brain","Heart","Eye","Lungs"] },
+  { q: "What number after 11,14,17,20?", a: "23", o: ["23","24","21","25"] },
+  { q: "What’s next 1,1,2,3,5,8,?", a: "13", o: ["13","10","12","14"] },
+  { q: "Who wrote Romeo & Juliet?", a: "William Shakespeare", o: ["William Shakespeare","Milton","Keats","Byron"] },
+  { q: "Which planet closest to Sun?", a: "Mercury", o: ["Mercury","Earth","Mars","Venus"] },
+  { q: "Which is hardest natural substance?", a: "Diamond", o: ["Diamond","Iron","Gold","Silver"] },
+  { q: "Which is largest planet?", a: "Jupiter", o: ["Jupiter","Earth","Saturn","Neptune"] },
+  { q: "Which bird can imitate human speech?", a: "Parrot", o: ["Parrot","Crow","Sparrow","Eagle"] }
 ];
 
-// ✅ Shuffle options for randomness
-function shuffle(array) {
-  return array.sort(() => Math.random() - 0.5);
+function startQuiz() {
+  startScreen.classList.add('hidden');
+  quizScreen.classList.remove('hidden');
+  currentQuestion = 0;
+  score = 0;
+  usedQuestions = [];
+  nextQuestion();
 }
 
-// ✅ Load next question
-function loadQuestion() {
-  if (usedQuestions.length === questions.length) return endGame();
+function nextQuestion() {
+  if (usedQuestions.length === questions.length) return showResult();
   let qIndex;
   do {
     qIndex = Math.floor(Math.random() * questions.length);
   } while (usedQuestions.includes(qIndex));
-
   usedQuestions.push(qIndex);
+
   const q = questions[qIndex];
-  questionText.textContent = q.q;
-  optionsContainer.innerHTML = "";
-  shuffle(q.o).forEach(opt => {
-    const btn = document.createElement("button");
+  levelElem.textContent = `Level ${usedQuestions.length}`;
+  questionElem.textContent = q.q;
+  optionsElem.innerHTML = '';
+
+  const shuffled = [...q.o].sort(() => 0.5 - Math.random());
+  shuffled.forEach(opt => {
+    const btn = document.createElement('button');
     btn.textContent = opt;
-    btn.className = "option";
-    btn.onclick = () => checkAnswer(opt, q.a);
-    optionsContainer.appendChild(btn);
+    btn.onclick = () => selectAnswer(opt === q.a);
+    optionsElem.appendChild(btn);
   });
 }
 
-// ✅ Check answer
-function checkAnswer(selected, correct) {
-  const buttons = document.querySelectorAll(".option");
-  buttons.forEach(b => (b.disabled = true));
-  if (selected === correct) {
-    score += 10;
-    scoreDisplay.textContent = `Score: ${score}`;
-  } else {
-    score -= 5;
-    scoreDisplay.textContent = `Score: ${score}`;
-  }
-  nextBtn.style.display = "block";
+function selectAnswer(correct) {
+  if (correct) score += 10;
+  else score -= 5;
+  scoreElem.textContent = `Score: ${score}`;
+
+  if (usedQuestions.length === 50) showResult();
+  else nextQuestion();
 }
 
-// ✅ Next button
-nextBtn.onclick = () => {
-  currentQuestionIndex++;
-  nextBtn.style.display = "none";
-  if (currentQuestionIndex < 50) {
-    loadQuestion();
-  } else {
-    endGame();
-  }
-};
+function showResult() {
+  quizScreen.classList.add('hidden');
+  resultScreen.classList.remove('hidden');
+  let msg = "";
+  if (score < 100) msg = "Your IQ was low, work harder!";
+  else if (score < 250) msg = "Very good, but keep practicing!";
+  else msg = "Genius! Outstanding performance!";
+  resultText.textContent = `${msg} Final Score: ${score}`;
 
-// ✅ End game + Leaderboard
-function endGame() {
-  gameContainer.style.display = "none";
-  resultContainer.style.display = "block";
-  let iqMessage = "";
-  if (score < 150) iqMessage = "😢 Your IQ was low, work harder!";
-  else if (score < 300) iqMessage = "🙂 Good job, but improve a bit!";
-  else iqMessage = "🚀 Genius! You nailed it!";
-
-  resultText.textContent = `${username}, your final score is ${score}. ${iqMessage}`;
-  updateLeaderboard(username, score);
+  saveLeaderboard(score);
+  showLeaderboard();
 }
 
-// ✅ Leaderboard local storage
-function updateLeaderboard(name, score) {
-  let data = JSON.parse(localStorage.getItem("leaderboard") || "[]");
+function saveLeaderboard(score) {
+  const name = prompt("Enter your name:");
+  const data = JSON.parse(localStorage.getItem('leaderboard') || "[]");
   data.push({ name, score });
   data.sort((a, b) => b.score - a.score);
-  data = data.slice(0, 5);
-  localStorage.setItem("leaderboard", JSON.stringify(data));
-  leaderboardList.innerHTML = "";
-  data.forEach(d => {
-    const li = document.createElement("li");
-    li.textContent = `${d.name} — ${d.score}`;
-    leaderboardList.appendChild(li);
+  localStorage.setItem('leaderboard', JSON.stringify(data.slice(0,5)));
+}
+
+function showLeaderboard() {
+  const data = JSON.parse(localStorage.getItem('leaderboard') || "[]");
+  leaderboardElem.innerHTML = "<h3>Leaderboard</h3>";
+  data.forEach((item, i) => {
+    leaderboardElem.innerHTML += `<div>${i+1}. ${item.name} — ${item.score}</div>`;
   });
 }
 
-// ✅ Start game
-startBtn.onclick = () => {
-  startBtn.style.display = "none";
-  gameContainer.style.display = "block";
-  loadQuestion();
-};
+startBtn.onclick = startQuiz;
+restartBtn.onclick = () => location.reload();

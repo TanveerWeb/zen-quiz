@@ -1,27 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ZenQuiz</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="game-container">
+  <div id="game-container">
     <h1 class="logo">z<span>Q</span></h1>
-    <h2 id="question">Loading...</h2>
-    <div id="options"></div>
-    <button id="next">Next ➜</button>
-    <p id="score">Score: 0</p>
+    <div id="start-screen">
+      <h2>Welcome to ZenQuiz</h2>
+      <button id="startBtn">Start Game</button>
+    </div>
+
+    <div id="quiz-screen" class="hidden">
+      <div id="level">Level 1</div>
+      <div id="question"></div>
+      <div id="options"></div>
+      <div id="score">Score: 0</div>
+    </div>
+
+    <div id="result-screen" class="hidden">
+      <h2 id="result-text"></h2>
+      <button id="restartBtn">Play Again</button>
+      <div id="leaderboard"></div>
+    </div>
+
+    <footer>Made by Tanveer</footer>
   </div>
-
-  <div id="popup" class="popup">
-    <p id="popup-msg"></p>
-  </div>
-
-  <audio id="correct-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3"></audio>
-  <audio id="wrong-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3"></audio>
-
   <script src="script.js"></script>
 </body>
 </html>

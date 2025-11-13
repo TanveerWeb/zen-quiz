@@ -1,121 +1,71 @@
 body {
-  margin: 0;
-  font-family: "Poppins", sans-serif;
-  background: linear-gradient(135deg, #cdefff, #e8f9ff);
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(120deg, #d7eaff, #b3d8ff);
   color: #222;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   height: 100vh;
+  margin: 0;
 }
 
-.game-container {
+#game-container {
   background: white;
   border-radius: 20px;
-  box-shadow: 0 0 20px rgba(0,0,0,0.1);
   padding: 30px;
-  width: 350px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.2);
   text-align: center;
-  animation: fadeIn 0.6s ease;
+  width: 90%;
+  max-width: 400px;
+  animation: fadeIn 1s ease;
 }
 
 .logo {
   font-size: 40px;
+  font-weight: bold;
   margin-bottom: 10px;
-  color: #3498db;
 }
+
 .logo span {
-  color: black;
+  color: #007BFF;
 }
 
-#question {
-  font-size: 18px;
-  margin-bottom: 20px;
-}
-
-#options {
-  display: grid;
-  gap: 10px;
-}
-
-.option-btn {
-  background: #f5fbff;
-  border: 2px solid #cde4ff;
-  border-radius: 10px;
-  padding: 10px;
-  font-size: 15px;
+button {
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 20px;
+  margin: 10px;
   cursor: pointer;
+  font-size: 16px;
   transition: 0.3s;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.hidden {
+  display: none;
+}
+
+#options button {
+  display: block;
+  width: 100%;
+  margin: 8px 0;
+  background-color: #e0f0ff;
   color: #000;
 }
 
-.option-btn:hover {
-  background: #b3e0ff;
-  transform: scale(1.05);
+#options button:hover {
+  background-color: #b3d8ff;
 }
 
-#next {
-  background: #3498db;
-  border: none;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 12px;
-  margin-top: 15px;
-  cursor: pointer;
-  transition: 0.3s;
-}
-#next:hover {
-  background: #217dbb;
-}
-
-#score {
-  margin-top: 10px;
-  font-weight: bold;
-}
-
-.popup {
-  display: none;
-  position: fixed;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(52,152,219,0.9);
-  color: white;
-  padding: 10px 20px;
-  border-radius: 12px;
-  animation: pop 0.3s ease;
-}
-
-@keyframes pop {
-  from {transform: translateX(-50%) scale(0.8);}
-  to {transform: translateX(-50%) scale(1);}
-}
-
-.result {
-  text-align: center;
-  padding: 30px;
-}
-
-.board {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-}
-
-.card {
-  background: #e8f6ff;
-  border-radius: 12px;
-  padding: 8px 15px;
-  width: 200px;
-  font-size: 15px;
-  animation: fadeIn 0.5s ease;
-}
-
-.credit {
-  margin-top: 15px;
+footer {
+  margin-top: 20px;
+  font-size: 14px;
   color: #555;
-  font-size: 13px;
 }
 
 @keyframes fadeIn {
