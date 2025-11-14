@@ -1,42 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ZenQuiz</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZenQuiz</title>
+
+    <!-- APP ICON (HOME SCREEN LOGO) -->
+    <link rel="icon" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
+
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-  <div class="container">
-    <div id="start-screen">
-      <h1 class="logo">z<span>Q</span></h1>
-      <h2>Welcome to ZenQuiz</h2>
-      <button id="start-btn">Start Quiz</button>
+
+    <div class="start-screen" id="startScreen">
+        <img src="logo.png" class="logo">
+        <h1 class="title">ZenQuiz</h1>
+        <button class="start-btn" onclick="startGame()">Start</button>
+        <p class="credit">Made by Tanveer</p>
     </div>
 
-    <div id="quiz-screen" class="hidden">
-      <div id="level">Level: 1</div>
-      <div id="question"></div>
-      <div id="options"></div>
-      <div id="score">Score: 0</div>
+    <div class="game-container hidden" id="gameBox">
+        <div class="score-bar">
+            <span id="scoreText">Score: 0</span>
+            <span id="levelText">Level: 1</span>
+        </div>
+
+        <div class="question-box" id="questionBox">
+            Loading...
+        </div>
+
+        <div class="options" id="optionsBox"></div>
     </div>
 
-    <div id="result-screen" class="hidden">
-      <h2>Quiz Complete!</h2>
-      <p id="final-score"></p>
-      <p id="iq-comment"></p>
-      <button id="restart-btn">Restart</button>
+    <div class="result-screen hidden" id="resultScreen">
+        <h2>Your Result</h2>
+        <p id="finalScore"></p>
+        <p id="iqMessage"></p>
 
-      <div id="leaderboard">
         <h3>Leaderboard</h3>
-        <ul id="leaderboard-list"></ul>
-      </div>
+        <div id="leaderboard"></div>
+
+        <button class="start-btn" onclick="restartGame()">Play Again</button>
     </div>
-  </div>
 
-  <audio id="correct-sound" src="https://cdn.pixabay.com/download/audio/2023/03/16/audio_8f2e36d77f.mp3?filename=correct-answer-147917.mp3"></audio>
-  <audio id="wrong-sound" src="https://cdn.pixabay.com/download/audio/2022/03/24/audio_d1f24e3c45.mp3?filename=wrong-answer-126516.mp3"></audio>
+    <audio id="correctSound" src="https://actions.google.com/sounds/v1/cartoon/pop.ogg"></audio>
+    <audio id="wrongSound" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg"></audio>
 
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
