@@ -1,34 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ZenQuiz</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZenQuiz</title>
+
+    <!-- Manifest added (Home screen logo fix) -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- Favicon (optional) -->
+    <link rel="icon" type="image/png" href="logo.png">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a1a;
+            color: white;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        #quiz-container {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .option {
+            background: #333;
+            padding: 12px;
+            margin: 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .option:hover {
+            background: #4a4a4a;
+        }
+
+        #start-btn {
+            padding: 15px 30px;
+            background: #00bfff;
+            color: black;
+            font-size: 18px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            margin-top: 40px;
+        }
+
+        #next-btn {
+            display: none;
+            padding: 12px 30px;
+            background: #00ff99;
+            color: black;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        img.logo {
+            width: 180px;
+            margin-top: 20px;
+            border-radius: 20px;
+        }
+    </style>
 </head>
+
 <body>
-  <div id="game-container">
-    <h1 class="logo">z<span>Q</span></h1>
-    <div id="start-screen">
-      <h2>Welcome to ZenQuiz</h2>
-      <button id="startBtn">Start Game</button>
+
+    <!-- Logo -->
+    <img src="logo.png" class="logo" alt="ZenQuiz Logo">
+
+    <h1>Welcome to ZenQuiz</h1>
+
+    <button id="start-btn">Start Quiz</button>
+
+    <div id="quiz-container">
+        <h2 id="question"></h2>
+        <div id="options"></div>
+
+        <button id="next-btn">Next</button>
     </div>
 
-    <div id="quiz-screen" class="hidden">
-      <div id="level">Level 1</div>
-      <div id="question"></div>
-      <div id="options"></div>
-      <div id="score">Score: 0</div>
-    </div>
+    <script src="script.js"></script>
 
-    <div id="result-screen" class="hidden">
-      <h2 id="result-text"></h2>
-      <button id="restartBtn">Play Again</button>
-      <div id="leaderboard"></div>
-    </div>
-
-    <footer>Made by Tanveer</footer>
-  </div>
-  <script src="script.js"></script>
 </body>
 </html>
