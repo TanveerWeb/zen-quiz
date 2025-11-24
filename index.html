@@ -6,12 +6,18 @@
   <title>ZenQuiz</title>
 
   <link rel="stylesheet" href="style.css">
-  <!-- use defer so script runs after DOM -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="logo.png">
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+  <!-- main script (defer so DOM ready) -->
   <script defer src="script.js"></script>
 </head>
 <body>
   <div class="app">
-    <!-- START SCREEN -->
+    <!-- START -->
     <section id="startScreen" class="screen center">
       <img src="logo.png" alt="ZenQuiz logo" class="logo" />
       <h1 class="app-title">ZenQuiz</h1>
@@ -23,29 +29,30 @@
       </div>
 
       <div class="small-note">Made by Tanveer</div>
-      <hr />
+
       <div class="leader-preview" id="leaderPreview">
-        <h3>Top scores</h3>
+        <h4>Top scores</h4>
         <div id="leaderPreviewList"></div>
       </div>
     </section>
 
-    <!-- GAME SCREEN -->
+    <!-- GAME -->
     <section id="gameScreen" class="screen hidden">
       <div class="topbar">
         <div id="levelText">Level 1/75</div>
         <div id="scoreText">Score: 0</div>
       </div>
 
-      <div id="questionCard" class="card fade">
+      <div id="questionCard" class="card fade glass">
+        <div id="timerBar"><div id="timerFill"></div></div>
         <div id="questionText" class="question-text">Question will appear here</div>
       </div>
 
       <div id="optionsBox" class="options-grid"></div>
-      <div class="hint">Tip: Options are shuffled every time</div>
+      <div class="hint">Tip: Options shuffle each time • 15s per question</div>
     </section>
 
-    <!-- RESULT SCREEN -->
+    <!-- RESULT -->
     <section id="resultScreen" class="screen hidden center">
       <h2>Game Over</h2>
       <p id="finalScoreText" class="final-score">Final Score: 0</p>
@@ -56,7 +63,7 @@
         <button id="saveScoreBtn" class="btn primary">Save Score</button>
       </div>
 
-      <h3>Leaderboard</h3>
+      <h3>Leaderboard (Global)</h3>
       <div id="leaderboardBox" class="leaderboard-box"></div>
 
       <div class="result-actions">
@@ -64,5 +71,12 @@
       </div>
     </section>
   </div>
+
+  <!-- sounds -->
+  <audio id="sndCorrect" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_5d2c6b6b4b.mp3?filename=correct-6058.mp3"></audio>
+  <audio id="sndWrong" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_b5c3f8b0f2.mp3?filename=wrong-6057.mp3"></audio>
+
+  <!-- confetti canvas -->
+  <canvas id="confettiCanvas" class="confetti"></canvas>
 </body>
 </html>
